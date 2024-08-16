@@ -1,0 +1,7 @@
+idx_chan = 276;
+
+XData = exg.time{1};
+YData = exg.trial{1}(idx_chan, :);
+
+figure
+plot(XData, YData)
