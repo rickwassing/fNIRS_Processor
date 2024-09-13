@@ -82,6 +82,9 @@ for i = 1:length(cfg.chanlist)
     % ---------------------------------------------------------------------
     % UPDATE LAYOUT
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    % Title
+    ax(1).Title.String = sprintf('%s-%s', cfg.chanlist{i}{1}, cfg.chanlist{i}{2});
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % Highlight the current channel
     set(findobj(ax(1).Children, 'Type', 'text'), 'Color', [0.44, 0.45, 0.46])
     h.tmp = findobj(ax(1).Children, 'String', upper(cfg.chanlist{i}{1}));
@@ -132,7 +135,11 @@ for i = 1:length(cfg.chanlist)
         ThisYOffset = ThisYOffset + abs(max([YData_raw; YData_preproc]));
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    ax(2).YLim = YLim;
+    try
+        ax(2).YLim = YLim;
+    catch
+        ax(2).YLim = [0, 1];
+    end
     ax(2).YTick = YLim(2);
     % ---------------------------------------------------------------------
     % HEMOGLOBIN CONCENTRATION
@@ -162,7 +169,11 @@ for i = 1:length(cfg.chanlist)
         %ThisYOffset = ThisYOffset + abs(max(YData));
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    ax(3).YLim = YLim;
+    try
+        ax(3).YLim = YLim;
+    catch 
+        ax(3).YLim = [0, 1];
+    end
     ax(3).YTick = YLim(2);
     % ---------------------------------------------------------------------
     % SIGNAL QUALITY
@@ -235,7 +246,11 @@ for i = 1:length(cfg.chanlist)
         h.psd(hidx).YData = YData;
     end
     ax(5).XLim = [XData(2), XData(end)];
-    ax(5).YLim = [min([h.psd.YData]), max([h.psd.YData])];
+    try
+        ax(5).YLim = [min([h.psd.YData]), max([h.psd.YData])];
+    catch
+        ax(5).YLim = [0, 1];
+    end
     % ---------------------------------------------------------------------
     outputfile = strrep(cfg.outputfilename, '_nirs', ['_desc-qc_chan-', strjoin(cfg.chanlist{i}, ''), '_nirs']);
     drawnow();

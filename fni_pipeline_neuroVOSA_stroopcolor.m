@@ -23,7 +23,7 @@ cd(bidsroot);
 
 % -------------------------------------------------------------------------
 % Add Patient demographics 
-age = 47;
+age = 49;
 
 % =========================================================================
 % CREATE PIPELINE
@@ -31,13 +31,13 @@ age = 47;
 % -------------------------------------------------------------------------
 % Import FNIRS data
 cfg = struct();
-cfg.datasetname = 'NeuroVosa';
+cfg.datasetname = 'NeuroVOSA';
 cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
-cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv07/ses-bl/fnirs/sub-nv07_ses-1_task-2back_run-1_fnirs_20240306-093737.snirf';
-cfg.sub = 'nv07'; % subject id
-cfg.ses = 'blki '; % session label
-cfg.task = '2back'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
+cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv04/ses-bl/fnirs/sub-nv04_ses-1_task-stroopcolor_run-1_fnirs_20240205-174124.snirf';
+cfg.sub = 'nv04'; % subject id
+cfg.ses = 'bl'; % session label
+cfg.task = 'stroopcolor'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
 cfg.participants.age = age;
 cfg.participants.sex = 'f';
 cfg.bidsroot = [bidsroot, '/rawdata']; % Don't change
@@ -124,7 +124,7 @@ pipe = [pipe; node];
 cfg = struct();
 cfg.stimlabel = {'x1'}; % label(s) of the stimulus to model
 cfg.contrast = 1;
-cfg.window = [-9, 24];
+cfg.window = [-9, 18];
 cfg.auxchans = {'gyro', 'accel'};
 cfg.baselinewindow = [0, 60]; % seconds
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -146,7 +146,7 @@ pipe = [pipe; node];
 % Graph trial quality figures within each channel
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 24];
+cfg.window = [-9, 18];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
 pipe = [pipe; node];
@@ -154,7 +154,7 @@ pipe = [pipe; node];
 % The same, but now after short-separated channel regression
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 24];
+cfg.window = [-9, 18];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
@@ -164,7 +164,7 @@ pipe = [pipe; node];
 % Graph individual trial quality figures across channels
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 24];
+cfg.window = [-9, 18];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);
@@ -172,7 +172,7 @@ pipe = [pipe; node];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 24];
+cfg.window = [-9, 18];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);

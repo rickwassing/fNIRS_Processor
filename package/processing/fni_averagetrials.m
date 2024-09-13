@@ -69,7 +69,7 @@ for i = 1:length(cfg.eventlabels)
         stim.states = [stim.states; data.raw.stim(idx).states];
     end
     % Call Homer3 function to do the averaging
-    [avg, std, numtrials] = hmrR_BlockAvg(data.(cfg.source), stim, cfg.window);
+    [avg, std, numtrials] = fni_blockavg(data.(cfg.source), stim, cfg.window);
     % Store output
     data.([cfg.source, '_avgtrial'])(i).trialtype = stim.name;
     data.([cfg.source, '_avgtrial'])(i).avg = avg;

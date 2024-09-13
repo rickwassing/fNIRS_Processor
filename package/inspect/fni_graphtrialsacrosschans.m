@@ -104,7 +104,7 @@ for e = 1:length(cfg.uniqueevents)
     if size(stim.data, 1) < 3
         continue
     end
-    avg = hmrR_BlockAvg(source, stim, cfg.window);
+    avg = fni_blockavg(source, stim, cfg.window);
     % ---------------------------------------------------------------------
     % UPDATE THE AVERAGE ACROSS CHANNELS
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

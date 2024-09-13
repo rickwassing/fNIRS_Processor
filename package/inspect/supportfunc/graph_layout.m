@@ -44,6 +44,12 @@ h.noseplot = plot(ax, [-0.19.*Lim, 0, 0.19.*Lim], [r.*Lim.*sin(0.42*pi), Lim, r.
     'LineWidth', 3, ...
     'Color', [0.84, 0.85, 0.86]);
 ax.Children = flipud(ax.Children);
-
+ax.Title.String = '<label>';
+ax.Title.FontSize = 8;
+ax.Title.FontWeight = 'normal';
+ax.Title.HorizontalAlignment = 'left';
+ax.Title.VerticalAlignment = 'top';
+ax.Title.Position(1) = ax.XLim(1);
+ax.Title.Position(2) = ax.YLim(2);
 
 end

@@ -50,6 +50,17 @@ switch cfg.fcn
         history.cfg = struct2json(cfg);
         history.methods = sprintf('Any (remaining) motion artefacts were automatically detected on the optical density timeseries for each channel using a sliding window of %.3f s, an amplitude threshold of %.1f and a z-score threshold of %.1f. Time segments +/- %.3f s around identified windows were marked as artefacts.', cfg.tmotion, cfg.ampthres, cfg.stdthres, cfg.tmask);
         history.cite = {};
+    case 'correctmotion'
+        history.cmd = '[data, log] = fni_correctmotion(data, cfg);';
+        history.cfg = struct2json(cfg);
+        switch cfg.method
+            case 'wavelet'
+                history.methods = sprintf('Motion artefacts were automatically corrected using wavelet decomposition and removing wavelet coefficients that exceeded %.1f the inter-quartile range.', cfg.iqr);
+                history.cite = {'10.1088/0967-3334/33/2/259'};
+            case 'tddr'
+                history.methods = sprintf('Motion artefacts were automatically corrected using temporal derivative distribution repair.');
+                history.cite = {'10.1016/j.neuroimage.2018.09.025'};
+        end
     case 'correctmotionwithwavelet'
         history.cmd = '[data, log] = fni_correctmotionwithwavelet(data, cfg);';
         history.cfg = struct2json(cfg);

@@ -95,7 +95,7 @@ for e = 1:length(cfg.uniqueevents)
     if size(stim.data, 1) < 3
         continue
     end
-    [avg, std, ~, ~, trials] = hmrR_BlockAvg(source, stim, cfg.window);
+    [avg, std, ~, ~, trials] = fni_blockavg(source, stim, cfg.window);
     trials = trials.yblk;
     % ---------------------------------------------------------------------
     % UPDATE FIGURE AND AXES DIMENSIONS
@@ -121,6 +121,9 @@ for e = 1:length(cfg.uniqueevents)
         % -----------------------------------------------------------------
         % UPDATE LAYOUT
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        % Title
+        ax(1).Title.String = sprintf('%s-%s', cfg.chanlist{i}{1}, cfg.chanlist{i}{2});
+        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         % Highlight the current channel
         set(findobj(ax(1).Children, 'Type', 'text'), 'Color', [0.44, 0.45, 0.46])
         h.tmp = findobj(ax(1).Children, 'String', upper(cfg.chanlist{i}{1}));
@@ -143,9 +146,17 @@ for e = 1:length(cfg.uniqueevents)
         h.trialimage.XData = avg.time;
         h.trialimage.YData = 1:size(trials, 4);
         h.trialimage.CData = squeeze(trials(:, 1, i, :))' .* 1000000;
-        ax(2).YLim = [1, size(trials, 4)] + [-0.5, 0.5];
+        try
+            ax(2).YLim = [1, size(trials, 4)] + [-0.5, 0.5];
+        catch
+            ax(2).YLim = [-0.5, 0.5];
+        end
         ax(2).YTick = 1:size(trials, 4);
-        ax(2).CLim = [-1 * max(abs(h.trialimage.CData(:))), max(abs(h.trialimage.CData(:)))];
+        try
+            ax(2).CLim = [-1 * max(abs(h.trialimage.CData(:))), max(abs(h.trialimage.CData(:)))];
+        catch
+            ax(2).CLim = [-1, 1];
+        end
         h.colorbar.Limits = ax(2).CLim;
         % -----------------------------------------------------------------
         % UPDATE AVERAGE TRACE
@@ -162,8 +173,12 @@ for e = 1:length(cfg.uniqueevents)
         h.hbostdtrial.YData = [avg.dataTimeSeries(:, cidxhbo) - std.dataTimeSeries(:, cidxhbo); flipud(avg.dataTimeSeries(:, cidxhbo) + std.dataTimeSeries(:, cidxhbo))];
         h.hbostdtrial.YData = h.hbostdtrial.YData.*1000000;
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        ax(3).YLim = [-1*max(abs([h.hbostdtrial.YData;h.hbrstdtrial.YData])), max(abs([h.hbostdtrial.YData;h.hbrstdtrial.YData]))];
-        ax(3).YTick = max(abs([h.hbostdtrial.YData;h.hbrstdtrial.YData]));
+        try
+            ax(3).YLim = [-1*max(abs([h.hbostdtrial.YData;h.hbrstdtrial.YData])), max(abs([h.hbostdtrial.YData;h.hbrstdtrial.YData]))];
+        catch
+            ax(3).YLim = [-1, 1];
+        end
+        ax(3).YTick = ax(3).YLim(2);
         % -----------------------------------------------------------------
         % UPDATE TRIAL ONSET MARKERS
         % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

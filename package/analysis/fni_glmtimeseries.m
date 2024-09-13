@@ -14,6 +14,7 @@
 %       'contrast' - [double] contrast vector
 %       'window' - [double] defines the range for the block average [tPre Post]
 %       'baselinewindow' - [double] defines the range for training the CCA filters
+%       'rejchans' - [cell] names of nirs channels to exclude
 %       'auxchans' - [cell] names of auxiliary channels to include as nuisance regressors
 %       'method' - [char] 'ordinary' or 'weighted' least squares
 %       'basisfcn' - [double] default: 1 for using consequtive gausians
@@ -71,29 +72,36 @@ fprintf('>> FNI: applying a GLM on the stimuli ''%s'' using a peri-stimulus wind
 % =========================================================================
 % EXECUTE
 % -------------------------------------------------------------------------
-% Get nuisance regressors including short-separation channels
-[nuisance_regressors, rcmap] = fni_gettccaregressors(data.dc, data.raw.aux, data.raw.probe, cfg);
+% Motion scrubbing is not supported yet in this FNI function
 motionscrubbing = [];
+% -------------------------------------------------------------------------
+% Exclude channels
+ml = manualrejectchannels(cfg.rejchans, data.dc.GetMeasListSrcDetPairs('reshape'));
+% -------------------------------------------------------------------------
+% Get the stims
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Convert to cell array
 if ~iscell(cfg.stimlabel)    
     cfg.stimlabel = {cfg.stimlabel};
 end
-% -------------------------------------------------------------------------
-% Get the stims
-idx = ismember({data.raw.stim.name}, cfg.stimlabel);
-stim = data.raw.stim(idx);
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+idx_stim = ismember({data.raw.stim.name}, cfg.stimlabel);
+stim = data.raw.stim(idx_stim);
 % Set all stim amplitudes to 1
 for i = 1:length(stim)
     stim(i).data(:, 3) = ones(size(stim(i).data, 1), 1);
     stim(i).states(:, 2) = ones(size(stim(i).states, 1), 1);
 end
 % -------------------------------------------------------------------------
+% Get nuisance regressors including short-separation channels
+[nuisance_regressors, rcmap] = fni_gettccaregressors(data.dc, data.raw.aux, data.raw.probe, cfg);
+% -------------------------------------------------------------------------
 % Apply GLM
 [data.glm.avg, data.glm.std, data.glm.ntrials, data.glm.dc, data.glm.resid, data.glm.sum2, data.glm.beta, data.glm.r, data.glm.stats] = ...
-    hmrR_GLM(data.dc, stim, data.raw.probe, [], nuisance_regressors, motionscrubbing, rcmap, ...
+    hmrR_GLM(data.dc, stim, data.raw.probe, {ml(:, 3)}, nuisance_regressors, motionscrubbing, rcmap, ...
     cfg.window, method, cfg.basisfcn, cfg.basiscfg, 0, 3, cfg.driftorder, cfg.contrast);
-[data.glmnocorr.avg, data.glmnocorr.std, data.glmnocorr.ntrials, data.glmnocorr.dc, data.glmnocorr.resid, data.glmnocorr.sum2, data.glmnocorr.beta, data.glmnocorr.r, data.glmnocorr.stats] = ...
-    hmrR_GLM(data.dc, stim, data.raw.probe, [], [], motionscrubbing, rcmap, ...
-    cfg.window, method, cfg.basisfcn, cfg.basiscfg, 0, 3, cfg.driftorder, cfg.contrast);
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Save config
 data.glm.cfg = cfg;
 % -------------------------------------------------------------------------
 % Homer returns the DC class with 3 dimension <time-by-hbx-by-channels>,

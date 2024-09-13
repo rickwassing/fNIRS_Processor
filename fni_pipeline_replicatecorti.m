@@ -12,6 +12,12 @@
 % - Breath-hold: 
 %       padding = 60 s, stimulus = variable, ISI = minimum 60 s
 
+% - Convert raw signal to optical density: https://mne.tools/mne-nirs/stable/generated/mne.preprocessing.nirs.optical_density.html
+% - Motion correction using Temporal Derivative Distribution Repair https://mne.tools/mne-nirs/stable/generated/mne.preprocessing.nirs.temporal_derivative_distribution_repair.html
+% - Butterworth filtering: lowpass 0.2 Hz https://mne.tools/mne-nirs/dev/auto_examples/general/plot_30_frequency.html#plot-filter-response
+% - Convert NIRS optical density data to haemoglobin concentration https://mne.tools/mne-nirs/stable/generated/mne.preprocessing.nirs.beer_lambert_law.html
+% - GLM or simple averaging
+
 % =========================================================================
 % INITIALIZE
 cd(fileparts(matlab.desktop.editor.getActiveFilename))
@@ -21,7 +27,7 @@ pipe = fni_init();
 bidsroot = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data';
 cd(bidsroot);
 
-age = 53;
+age = 21;
 
 % =========================================================================
 % CREATE PIPELINE
@@ -32,8 +38,8 @@ cfg = struct();
 cfg.datasetname = 'NeuroVosa';
 cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
-cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv16/ses-bl/fnirs/sub-nv16_ses-1_task-fingertapping_run-1_fnirs_20240911-091903.snirf';
-cfg.sub = 'nv16'; % subject id
+cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv06/ses-bl/fnirs/sub-nv06_ses-1_task-fingertapping_run-1_fnirs_20240301-153018.snirf';
+cfg.sub = 'nv06replicatecorti'; % subject id
 cfg.ses = 'bl'; % session label
 cfg.task = 'fingertap'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
 cfg.participants.age = age;
@@ -52,9 +58,9 @@ pipe = [pipe; node];
 % Correct motion artefacts within each channel
 cfg = struct();
 cfg.source = 'dod';
-cfg.iqr = 1.5; % used to detect outliers
+cfg.method = 'tddr';
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-node = fni_node('correctmotionwithwavelet', cfg);
+node = fni_node('correctmotion', cfg);
 pipe = [pipe; node];
 
 % -------------------------------------------------------------------------
@@ -72,8 +78,8 @@ pipe = [pipe; node];
 % Apply bandpass filter to delta-optical density timeseries
 cfg = struct();
 cfg.source = 'dod_mc'; % apply bandpass filter to 'dod_mc'
-cfg.hpf = 1/60; % Hz
-cfg.lpf = 1/2; % Hz
+cfg.hpf = 1/100; % Hz
+cfg.lpf = 0.2; % Hz
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('bandpassfilt', cfg);
 pipe = [pipe; node];
@@ -82,8 +88,8 @@ pipe = [pipe; node];
 % Apply bandpass filter to auxiliary channels
 cfg = struct();
 cfg.source = 'aux'; % apply bandpass filter to 'dod_mc'
-cfg.hpf = 1/60; % Hz. Note, must be equal to bandpass filter applied to 'dod'
-cfg.lpf = 1/2; % Hz. Note, must be equal to bandpass filter applied to 'dod'
+cfg.hpf = 1/100; % Hz. Note, must be equal to bandpass filter applied to 'dod'
+cfg.lpf = 0.2; % Hz. Note, must be equal to bandpass filter applied to 'dod'
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('bandpassfilt', cfg);
 pipe = [pipe; node];
@@ -121,8 +127,9 @@ pipe = [pipe; node];
 % Apply General Linear Model
 cfg = struct();
 cfg.stimlabel = {'x1', 'x2'}; % label(s) of the stimulus to model
+cfg.rejchans = {'s10-d2'};
 cfg.contrast = 1;
-cfg.window = [-9, 12];
+cfg.window = [-6, 12];
 cfg.auxchans = {'gyro', 'accel'};
 cfg.baselinewindow = [0, 60]; % seconds
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,7 +151,7 @@ pipe = [pipe; node];
 % Graph trial quality figures within each channel
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 12];
+cfg.window = [-6, 12];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
 pipe = [pipe; node];
@@ -152,7 +159,7 @@ pipe = [pipe; node];
 % The same, but now after short-separated channel regression
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 12];
+cfg.window = [-6, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
@@ -162,7 +169,7 @@ pipe = [pipe; node];
 % Graph individual trial quality figures across channels
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 12];
+cfg.window = [-6, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);
@@ -170,7 +177,7 @@ pipe = [pipe; node];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 12];
+cfg.window = [-6, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);

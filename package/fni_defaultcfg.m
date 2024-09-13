@@ -127,6 +127,24 @@ switch cfg.fcn
             cfg.tmask = 1;
         end
         % =================================================================
+    case 'correctmotion'
+        % -----------------------------------------------------------------
+        % Checks
+        requiredfields = {'source'};
+        for i = 1:length(requiredfields)
+            if ~isfield(cfg, requiredfields{i})
+                error('>> FNI: Configuration must contain the field ''%s''.', requiredfields{i})
+            end
+        end
+        % -----------------------------------------------------------------
+        % Default values
+        if ~isfield(cfg, 'method')
+            cfg.method = 'wavelet';
+        end
+        if ~isfield(cfg, 'iqr')
+            cfg.iqr = 1.5;
+        end
+        % =================================================================
     case 'correctmotionwithwavelet'
         % -----------------------------------------------------------------
         % Checks
@@ -259,11 +277,12 @@ switch cfg.fcn
             [filepath, cfg.trainingfile] = fileparts(data.info.outputfile);
             cfg.trainingfile = fullfile(filepath, strrep(cfg.trainingfile, '_nirs', '_tccafilter.txt'));
         end
+        if ~isfield(cfg, 'rejchans'); cfg.rejchans = ''; end
         if ~isfield(cfg, 'contrast'); cfg.contrast = 0; end
         if ~isfield(cfg, 'method'); cfg.method = 'ordinary'; end %  use 'ordinary' or 'weighted' least squares
         if ~isfield(cfg, 'basisfcn'); cfg.basisfcn = 1; end % use consecutive sequence of gausians
         if ~isfield(cfg, 'basiscfg'); cfg.basiscfg = [0.5, 0.5]; end % standard deviation and time-step
-        if ~isfield(cfg, 'driftorder'); cfg.driftorder = 3; end
+        if ~isfield(cfg, 'driftorder'); cfg.driftorder = 0; end
         if ~isfield(cfg, 'timelag'); cfg.timelag = 3; end
         if ~isfield(cfg, 'stepsize'); cfg.stepsize = 0.8; end
         if ~isfield(cfg, 'corrthresh'); cfg.corrthresh = 0.3; end

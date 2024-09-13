@@ -79,6 +79,8 @@ try % wrapper to catch any errors
                 [data, l] = fni_raw2dod(data);
             case 'detectmotionartefactbychannel'
                 [data, l] = fni_detectmotionartefactbychannel(data, node.cfg);
+            case 'correctmotion'
+                [data, l] = fni_correctmotion(data, node.cfg);
             case 'correctmotionwithwavelet'
                 [data, l] = fni_correctmotionwithwavelet(data, node.cfg);
             case 'bandpassfilt'

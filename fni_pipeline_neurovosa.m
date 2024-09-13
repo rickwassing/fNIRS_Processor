@@ -36,8 +36,8 @@ cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
 cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv01/ses-bl/fnirs/sub-nv01_ses-bl_task-2back_run-1_fnirs_20230720-085611.snirf';
 cfg.sub = 'nv01'; % subject id
-cfg.ses = 'bl'; % session label
-cfg.task = '2back'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
+cfg.ses = 'bl'; % session label ("bl" or "fu")
+cfg.task = 'stroop'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
 cfg.participants.age = age;
 cfg.participants.sex = 'm';
 cfg.bidsroot = [bidsroot, '/rawdata']; % Don't change
@@ -122,9 +122,9 @@ pipe = [pipe; node];
 % -------------------------------------------------------------------------
 % Apply General Linear Model
 cfg = struct();
-cfg.stimlabel = {'x1', 'x2'}; % label(s) of the stimulus to model
+cfg.stimlabel = {'x1'}; % label(s) of the stimulus to model
 cfg.contrast = 1;
-cfg.window = [-9, 20];
+cfg.window = [-12, 18];
 cfg.auxchans = {'gyro', 'accel'};
 cfg.baselinewindow = [0, 60]; % seconds
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,18 +1,14 @@
-% FNI_CORRECTMOTIONWITHTDD
-% Perform a wavelet transformation of the dod data and computes the
-% distribution of the wavelet coefficients. It sets the coefficient
-% exceeding iqr times the interquartile range to zero, because these are 
-% probably due to motion artifacts. set iqr<0 to skip this function.
-% The algorithm follows in part the procedure described by
-% Molavi et al.,Physiol Meas, 33, 259-270 (2012).
+% FNI_CORRECTMOTION
+% Perform motion correction using a certain method described in CFG
 %
 % Usage:
-%   >> [data, log] = fni_correctmotionwithwavelet(data, cfg);
+%   >> [data, log] = fni_correctmotion(data, cfg);
 %
 % Inputs:
 %   'data.dod' - [DataClass] Homer3 data class
 %   'cfg' - [struct] configuration with the fields
 %       'source' - [double] used to detect outliers in the wavelet decomposition
+%       'method' - [char] 'wavelet', or 'tddr'
 %       'iqr' - [double] used to detect outliers in the wavelet decomposition
 %
 % Outputs:
@@ -39,7 +35,7 @@
 % adapt the material, they must license the modified material under
 % identical terms.
 
-function [data, log] = fni_correctmotionwithwavelet(data, cfg)
+function [data, log] = fni_correctmotion(data, cfg)
 % =========================================================================
 % INITIALIZE
 log = {};
@@ -47,12 +43,26 @@ log = {};
 % Check the config
 cfg = fni_defaultcfg(cfg, data);
 % =========================================================================
-% COMMAND WINDOW
-fprintf('>> FNI: correcting motion artefacts by removing wavelett coefficients exceeding %.1f times the inter-quartile range\n', cfg.iqr);
-% =========================================================================
 % EXECUTE
-data.([cfg.source, '_mc']) = hmrR_MotionCorrectWavelet(data.(cfg.source), [], [], cfg.iqr, 1);
+switch cfg.method
+    case 'wavelet'
+        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        % COMMAND WINDOW
+        fprintf('>> FNI: correcting motion artefacts by removing wavelett coefficients exceeding %.1f times the inter-quartile range\n', cfg.iqr);
+        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        % RUN MC
+        data.([cfg.source, '_mc']) = hmrR_MotionCorrectWavelet(data.(cfg.source), [], [], cfg.iqr, 1);
+    case 'tddr'
+        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        % COMMAND WINDOW
+        fprintf('>> FNI: correcting motion artefacts using temporal derivative distribution repair\n', cfg.iqr);
+        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        % RUN MC
+        data.([cfg.source, '_mc']) = hmrMotionCorrectTDDR(data.(cfg.source));
+end
 % =========================================================================
 % History
 data = fni_history(data, cfg);
+
+
 end

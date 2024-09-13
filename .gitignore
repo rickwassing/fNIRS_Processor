@@ -1,5 +1,9 @@
-*.mp4
 ~*
+*.mp4
+*.asv
+*.doc
+*.docx
+Thumbs.db
 .DS_Store
 cogtests
 documentation
