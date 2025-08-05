@@ -87,6 +87,8 @@ try % wrapper to catch any errors
                 [data, l] = fni_bandpassfilt(data, node.cfg);
             case 'dod2dc'
                 [data, l] = fni_dod2dc(data, node.cfg);
+            case 'scalpcouplingindex'
+                [data, l] = fni_scalpcouplingindex(data, node.cfg);
             case 'signalqualityindex'
                 [data, l] = fni_signalqualityindex(data, node.cfg);
             case 'calcinstantaneousheartrate'

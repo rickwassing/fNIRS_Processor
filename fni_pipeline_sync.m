@@ -138,8 +138,8 @@ node = fni_node('graphchannelquality', []); % no configuration required
 pipe = [pipe; node];
 
 % -------------------------------------------------------------------------
-% Graph GLM nuisance regression
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Graph GLM nuisance regression - - - - - - - - - - - - - - - - - - - - - -
+% - - - - - - - - - - - - - - -
 node = fni_node('graphglmtimeseries', []); % no configuration required
 pipe = [pipe; node];
 
@@ -190,4 +190,3 @@ pipe = [pipe; node];
 % =========================================================================
 % RUN
 [data, log] = fni_run(pipe);
-

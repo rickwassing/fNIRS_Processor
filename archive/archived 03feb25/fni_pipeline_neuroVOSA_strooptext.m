@@ -18,12 +18,12 @@ cd(fileparts(matlab.desktop.editor.getActiveFilename))
 pipe = fni_init();
 % -------------------------------------------------------------------------
 % Root directory of your BIDS dataset
-bidsroot = '/Volumes/sleep/Sleep/5. HD-EEG/HD EEG Research Projects/15. HDEEG ORACLE/7. Participant Data';
+bidsroot = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data';
 cd(bidsroot);
 
 % -------------------------------------------------------------------------
 % Add Patient demographics 
-age = 58;
+age = 49;
 
 %% =========================================================================
 % CREATE PIPELINE
@@ -31,13 +31,13 @@ age = 58;
 % -------------------------------------------------------------------------
 % Import FNIRS data
 cfg = struct();
-cfg.datasetname = 'Oracle';
+cfg.datasetname = 'NeuroVOSA';
 cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
-cfg.sourcefile = '/Volumes/sleep/Sleep/5. HD-EEG/HD EEG Research Projects/15. HDEEG ORACLE/7. Participant Data/sourcedata/OR009/fnirs/sub-009_ses-1_task-stroopcolor_run-1_fnirs_20240617-190821.snirf';
-cfg.sub = 'or009'; % subject id
-cfg.ses = 'bl'; % session label
-cfg.task = 'stroopcolor'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
+cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv13/ses-fu/fnirs/sub-nv13_ses-2_task-strooptext_run-1_fnirs_20240904-111745.snirf';
+cfg.sub = 'nv13'; % subject id
+cfg.ses = 'fu'; % session label
+cfg.task = 'strooptext'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
 cfg.participants.age = age;
 cfg.participants.sex = 'f';
 cfg.bidsroot = [bidsroot, '/rawdata']; % Don't change

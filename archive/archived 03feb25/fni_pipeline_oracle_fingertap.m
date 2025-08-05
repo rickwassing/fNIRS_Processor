@@ -18,12 +18,10 @@ cd(fileparts(matlab.desktop.editor.getActiveFilename))
 pipe = fni_init();
 % -------------------------------------------------------------------------
 % Root directory of your BIDS dataset
-bidsroot = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data';
+bidsroot = '/Volumes/sleep/Sleep/5. HD-EEG/HD EEG Research Projects/15. HDEEG ORACLE/7. Participant Data';
 cd(bidsroot);
 
-% -------------------------------------------------------------------------
-% Add Patient demographics 
-age = 49;
+age = 47;
 
 % =========================================================================
 % CREATE PIPELINE
@@ -31,15 +29,15 @@ age = 49;
 % -------------------------------------------------------------------------
 % Import FNIRS data
 cfg = struct();
-cfg.datasetname = 'NeuroVOSA';
+cfg.datasetname = 'Oracle';
 cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
-cfg.sourcefile = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv04/ses-bl/fnirs/sub-nv04_ses-1_task-stroopcolor_run-1_fnirs_20240205-174124.snirf';
-cfg.sub = 'nv04'; % subject id
+cfg.sourcefile = '/Volumes/sleep/Sleep/5. HD-EEG/HD EEG Research Projects/15. HDEEG ORACLE/7. Participant Data/sourcedata/OR042/fnirs/sub-042_ses-1_task-fingertapping_run-1_fnirs_20241111-175608.snirf';
+cfg.sub = 'or042'; % subject id
 cfg.ses = 'bl'; % session label
-cfg.task = 'stroopcolor'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
+cfg.task = 'fingertap'; % 'psg', 'rspm', 'rsam', '2back', 'breathhold', 'fingertap', 'stroopcolor', or 'strooptext'
 cfg.participants.age = age;
-cfg.participants.sex = 'f';
+cfg.participants.sex = 'm';
 cfg.bidsroot = [bidsroot, '/rawdata']; % Don't change
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('import', cfg);
@@ -124,9 +122,9 @@ pipe = [pipe; node];
 cfg = struct();
 cfg.stimlabel = {'x1'}; % label(s) of the stimulus to model
 cfg.contrast = 1;
-cfg.window = [-9, 18];
+cfg.window = [-9, 12];
 cfg.auxchans = {'gyro', 'accel'};
-cfg.baselinewindow = [0, 60]; % seconds
+cfg.baselinewindow = [0, 210]; % seconds
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('glmtimeseries', cfg);
 pipe = [pipe; node];
@@ -146,7 +144,7 @@ pipe = [pipe; node];
 % Graph trial quality figures within each channel
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 18];
+cfg.window = [-9, 12];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
 pipe = [pipe; node];
@@ -154,7 +152,7 @@ pipe = [pipe; node];
 % The same, but now after short-separated channel regression
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 18];
+cfg.window = [-9, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialswithinchan', cfg);
@@ -164,7 +162,7 @@ pipe = [pipe; node];
 % Graph individual trial quality figures across channels
 cfg = struct();
 cfg.source = 'dc';
-cfg.window = [-9, 18];
+cfg.window = [-9, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);
@@ -172,7 +170,7 @@ pipe = [pipe; node];
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cfg = struct();
 cfg.source = 'glm';
-cfg.window = [-9, 18];
+cfg.window = [-9, 12];
 cfg.sschandist = 15;
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 node = fni_node('graphtrialsacrosschans', cfg);

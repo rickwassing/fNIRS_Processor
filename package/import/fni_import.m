@@ -95,7 +95,12 @@ cfg.coordsystem = fni_coordsystemjson(data.raw.hdr);
 data.raw.cfg.event = cfg.events;
 % -------------------------------------------------------------------------
 % Save the data as a BIDS dataset
-cfg = data2bids(cfg, data.raw);
+try
+    cfg = data2bids(cfg, data.raw);
+catch ME
+    cfg.writetsv = 'no'; % TODO: double check this is a proper solution for when the output exists already
+    cfg = data2bids(cfg, data.raw);
+end
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Store the BIDS config
 data.info = cfg;
@@ -105,6 +110,7 @@ data.info.optodes = ft_read_tsv(strrep(data.info.outputfile, '_nirs.snirf', '_op
 data.info.events = ft_read_tsv(strrep(data.info.outputfile, '_nirs.snirf', '_events.tsv'));
 % -------------------------------------------------------------------------
 % Convert to Homer3 SNIRF format
+check = data.raw;
 data.raw = SnirfClass(cfg.outputfile);
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Store the events as a StimClass

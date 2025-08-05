@@ -173,6 +173,24 @@ switch cfg.fcn
             end
         end
         % =================================================================
+    case 'scalpcouplingindex'
+        % -----------------------------------------------------------------
+        % Checks
+        requiredfields = {'source'};
+        for i = 1:length(requiredfields)
+            if ~isfield(cfg, requiredfields{i})
+                error('>> FNI: Configuration must contain the field ''%s''.', requiredfields{i})
+            end
+        end
+        % -----------------------------------------------------------------
+        % Default values
+        if ~isfield(cfg, 'windowlength')
+            cfg.windowlength = 10;
+        end
+        if ~isfield(cfg, 'overlap')
+            cfg.overlap = 50;
+        end
+        % =================================================================
     case 'signalqualityindex'
         % -----------------------------------------------------------------
         % Checks

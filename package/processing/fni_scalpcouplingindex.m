@@ -1,13 +1,11 @@
-% FNI_SIGNALQUALITYINDEX
-% Calculates signal quality in a numeric scale from 1 (very low quality) to
-% 5 (very high quality).
+% FNI_SCALPCOUPLINGINDEX
+% Calculates scalp coupling index.
 %
 % Usage:
-%   >> [data, log] = fni_signalqualityindex(data, cfg);
+%   >> [data, log] = fni_scalpcouplingindex(data, cfg);
 %
 % Inputs:
 %   'data.dod' - [DataClass] Homer3 data class
-%   'data.dc' - [DataClass] Homer3 data class
 %   'cfg' - [struct] configuration with the fields
 %       'source' - [char] the data class to compute the SCI for
 %       'windowlength' - [double] window length in seconds
@@ -15,7 +13,6 @@
 %
 % Outputs:
 %   'data.quality' - [struct] quality assessments with the fields
-%       'sqi' - [double] <m x n> signal quality index for each segment m and channel n
 %       'sci' - [double] <m x n> scalp coupling index for each segment m and channel n
 %   'log' - [cell] errors and warnings
 
@@ -35,7 +32,7 @@
 % Permissions beyond the scope of this license may be available upon 
 % request at science@artinis.com.
 
-function [data, log] = fni_signalqualityindex(data, cfg)
+function [data, log] = fni_scalpcouplingindex(data, cfg)
 % =========================================================================
 % INITIALIZE
 log = {};
@@ -44,15 +41,15 @@ log = {};
 cfg = fni_defaultcfg(cfg, data);
 % =========================================================================
 % COMMAND WINDOW
-fprintf('>> FNI: calculating signal quality index on source ''%s'' using a sliding window of %i seconds and %i %% overlap.\n', cfg.source, cfg.windowlength, cfg.overlap);
+fprintf('>> FNI: calculating scalp coupling index on source ''%s'' using a sliding window of %i seconds and %i %% overlap.\n', cfg.source, cfg.windowlength, cfg.overlap);
 % =========================================================================
 % EXECUTE
 % -------------------------------------------------------------------------
 % Get the channel list and their indices
 [chanlist, chanindex] = getchannellist(data.(cfg.source).measurementList);
 % -------------------------------------------------------------------------
-pnts = size(data.dc.time, 1); % number of data points
-fs = round(1/mean(diff(data.dc.time))); % sampling rate
+pnts = size(data.(cfg.source).time, 1); % number of data points
+fs = round(1/mean(diff(data.(cfg.source).time))); % sampling rate
 win = cfg.windowlength*fs; % window size in samples
 % Make sure the window is odd
 if mod(win, 2) == 0
@@ -68,7 +65,6 @@ if step < 1
 end
 % -------------------------------------------------------------------------
 % Init output
-data.quality.sqi = nan(pnts, length(chanlist));
 data.quality.sci = nan(pnts, length(chanlist));
 previ = [];
 % -------------------------------------------------------------------------
@@ -106,34 +102,11 @@ for i = 1:step:pnts
             error('>> FNI: Found no channel or more than one channel for wavelength 2.')
         end
         dod_lambda2 = asrow(data.(cfg.source).dataTimeSeries(slidewin(1):slidewin(2), cidx));
-        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        % Oxygenated hemoglobin concentrations
-        cidx = ...
-            [data.dc.measurementList.sourceIndex] == chanindex(j, 1) & ...
-            [data.dc.measurementList.detectorIndex] == chanindex(j, 2) & ...
-            strcmpi({data.dc.measurementList.dataTypeLabel}, 'HbO');
-        if ~any(cidx) || sum(cidx) > 1 % we should find one and only one channel
-            error('>> FNI: Found no channel or more than one channel for oxygenated hemoglobin.')
-        end
-        dc_hbo = asrow(data.dc.dataTimeSeries(slidewin(1):slidewin(2), cidx));
-        % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        % Deoxygenated hemoglobin concentrations
-        cidx = ...
-            [data.dc.measurementList.sourceIndex] == chanindex(j, 1) & ...
-            [data.dc.measurementList.detectorIndex] == chanindex(j, 2) & ...
-            strcmpi({data.dc.measurementList.dataTypeLabel}, 'HbR');
-        if ~any(cidx) || sum(cidx) > 1 % we should find one and only one channel
-            error('>> FNI: Found no channel or more than one channel for deoxygenated hemoglobin.')
-        end
-        dc_hbr = asrow(data.dc.dataTimeSeries(slidewin(1):slidewin(2), cidx));
         % -----------------------------------------------------------------
-        % Calculate SQI and SCI
+        % Calculate SCI
         if isempty(previ) || step == 1
-            data.quality.sqi(i, j) = signalqualityindex(dod_lambda1, dod_lambda2, dc_hbo, dc_hbr, fs);
             data.quality.sci(i, j) = scalpcouplingindex(dod_lambda1, dod_lambda2, fs);
         else
-            tmp = signalqualityindex(dod_lambda1, dod_lambda2, dc_hbo, dc_hbr, fs);
-            data.quality.sqi(previ+1:i, j) = linspace(data.quality.sqi(previ, j), tmp, step);
             tmp = scalpcouplingindex(dod_lambda1, dod_lambda2, fs);
             data.quality.sci(previ+1:i, j) = linspace(data.quality.sci(previ, j), tmp, step);
         end   
@@ -141,9 +114,6 @@ for i = 1:step:pnts
     previ = i;
 end
 keyboard
-dod_lambda1 = asrow(data.(cfg.source).dataTimeSeries(:, cidx));
-dod_lambda2 = asrow(data.(cfg.source).dataTimeSeries(:, cidx));
-scalpcouplingindex(dod_lambda1, dod_lambda2, fs)
 % =========================================================================
 % History
 data = fni_history(data, cfg);

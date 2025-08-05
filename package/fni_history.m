@@ -91,6 +91,11 @@ switch cfg.fcn
     case 'signalqualityindex'
         history.cmd = '[data, log] = fni_signalqualityindex(data, cfg);';
         history.cfg = struct2json(cfg);
+        history.methods = '[TODO: revise]';
+        history.cite = {'TODO: ???'};
+    case 'scalpcouplingindex'
+        history.cmd = '[data, log] = fni_scalpcouplingindex(data, cfg);';
+        history.cfg = struct2json(cfg);
         history.methods = 'The scalp coupling index was calculated to determine of the quality of the connection between the optode and the scalp.';
         history.cite = {'10.1016/j.heares.2013.11.007.'};
     case 'averagetrials'

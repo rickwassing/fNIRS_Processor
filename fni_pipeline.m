@@ -4,7 +4,7 @@ cd(fileparts(matlab.desktop.editor.getActiveFilename))
 pipe = fni_init();
 % -------------------------------------------------------------------------
 % Root directory of your BIDS dataset
-bidsroot = '/Volumes/sleep/Sleep/3. ACTIVE STUDIES/Brain Cleaning in OSA/07.Data';
+bidsroot = '/Volumes/Sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data';
 cd(bidsroot);
 
 %% =========================================================================
@@ -16,11 +16,11 @@ cfg = struct();
 cfg.datasetname = 'NeuroVosa';
 cfg.manufacturer = 'Cortivision'; % 'Artenis' or 'Cortivision'
 cfg.manufacturersmodelname = 'Photon cap'; % 'PortaLight MKII' or 'Photon cap'
-cfg.sourcefile = '/Volumes/NO NAME/sub-a-test_ses-1_task-stroopcolor_run-1_fnirs_20231206-145047.snirf';
-cfg.sub = 'a'; % subject id
-cfg.ses = 'bl'; % session label
-cfg.task = 'stroop'; % task name
-cfg.participants.age = 21;
+cfg.sourcefile = '/Volumes/Sleep/Sleep/3. ACTIVE STUDIES/NeuroVOSA/07. Data/sourcedata/sub-nv05/ses-fu/fnirs/sub-nv05_ses-2_task-fingertapping_run-1_fnirs_20240503-101749.snirf';
+cfg.sub = 'nv05'; % subject id
+cfg.ses = 'fu'; % session label
+cfg.task = 'fingertap'; % task name
+cfg.participants.age = 44;
 cfg.participants.sex = 'm';
 cfg.bidsroot = [bidsroot, '/rawdata']; % don't change
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,8 +92,8 @@ pipe = [pipe; node];
 % -------------------------------------------------------------------------
 % Apply General Linear Model
 cfg = struct();
-cfg.stimlabel = {'x1'}; % label(s) of the stimulus to model
-cfg.window = [-12, 24];
+cfg.stimlabel = {'x1', 'x2'}; % label(s) of the stimulus to model
+cfg.window = [-6, 12];
 cfg.auxchans = {'gyro', 'accel'};
 cfg.baselinewindow = [0, 60]; % seconds
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
